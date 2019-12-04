@@ -24,8 +24,8 @@ done
 
 LED R SOLID
 #this will exit 0 if a dhcp related packet is seen, and 124 if not
-#todo, specifically look for dhcp discover?
-if timeout 10 tcpdump -i eth0 -c 1 -q port 67 and port 68 > /dev/null 2>&1; then
+#todo: this only looks for a dhcp request/discover and doesn't check that there was no reply...
+if timeout 10 tcpdump -i eth0 -c 1 -q udp src port 68 > /dev/null 2>&1; then
   #we saw someone looking for a dhcp server, so let's grant the wish
   NETMODE DHCP_SERVER
   LED Y SOLID
