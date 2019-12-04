@@ -15,6 +15,7 @@
 # LED White ... static ip set
 
 LED SETUP
+CONNECTIVITY="false"
 #todo, add a bunch of led status
 
 #first we chill and wait until we are connected
@@ -28,26 +29,35 @@ LED R SOLID
 if timeout 10 tcpdump -Z nobody -i eth0 -c 1 -q udp src port 68 > /dev/null 2>&1; then
   #we saw someone looking for a dhcp server, so let's grant the wish
   NETMODE DHCP_SERVER
+  CONNECTIVITY="true"
   LED Y SOLID
 else
   #we didn't see anyone looking for a dhcp server, so we try being a client
   NETMODE DHCP_CLIENT
+  LED G FAST
   for i in {1..60}; do
     #could drop the space after inet to include ipv6 only networks
     if ip addr show eth0 | grep -q 'inet '; then
       LED G SOLID
+      CONNECTIVITY="true"
       break
     else
       sleep 1
     fi
   done
-  #at this point we have waited 60 seconds for dhcp and not gotten an address, that is long enough
-  /etc/init.d/odhcpd stop #add this to NETMODE?
-  LED W FAST
-  #tcpdump here for a valid ip and netmask
-  #arp ping addresses in the valid range and find on that doesn't respond
-  #set ip address
-  LED W SOLID
+  if [ "${CONNECTIVITY}" != "true" ]; then
+    #at this point we have waited 60 seconds for dhcp and not gotten an address, that is long enough
+    #/etc/init.d/odhcpd stop #add this to NETMODE?
+    #this next bit is theoretical and hard
+    #LED W FAST
+    #tcpdump here for a valid ip and netmask
+    #arp ping addresses in the valid range and find on that doesn't respond
+    #set ip address
+    #LED W SOLID
+  fi
 fi
 
-#now we are connected, do evil things
+if [ "${CONNECTIVITY}" = "true" ]; then
+  #now we are connected, do evil things
+  true
+fi
