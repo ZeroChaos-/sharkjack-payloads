@@ -51,6 +51,7 @@ else
     #this next bit is theoretical and hard
     #LED W FAST
     #tcpdump here for a valid ip and netmask
+    #ipcalc -rn $(tcpdump -G 60 -W 1 -Z nobody -ni wlan0 not host 0.0.0.0 and not host 255.255.255.255 and not host 172.20.1.182 and 'ip or arp' -c 200 2> /dev/null | awk '{if ($2=="IP") {print $3"\n"substr($5, 1, length($5)-1)} else {print $5"\n"substr($7, 1, length($7)-1)}}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort -u | grep -vE '^224\.|^23.\.|^0\.0\.0\.0$' | sed -e 1b -e '$!d' | sed -e 's#\.1$#\.0#' | tr "\n" " ") | tail -n 1
     #arp ping addresses in the valid range and find on that doesn't respond
     #set ip address
     #LED W SOLID
